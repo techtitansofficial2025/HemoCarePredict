@@ -1,426 +1,239 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HemoCare - Anemia Prediction</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
-        }
-
-        .logo::before {
-            content: '🩸';
-            font-size: 24px;
-        }
-
-        h1 {
-            font-family: 'Poppins', sans-serif;
-            color: #2c3e50;
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-        }
-
-        .subtitle {
-            font-family: 'Inter', sans-serif;
-            color: #7f8c8d;
-            font-size: 16px;
-            font-weight: 400;
-            letter-spacing: 0.2px;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-            position: relative;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #34495e;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            font-size: 14px;
-            letter-spacing: 0.1px;
-        }
-
-        input[type="number"], select {
-            width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #e0e6ed;
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 16px;
-            font-weight: 400;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-            letter-spacing: 0.2px;
-        }
-
-        input[type="number"]:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            transform: translateY(-1px);
-        }
-
-        select {
-            cursor: pointer;
-        }
-
-        .input-icon {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #95a5a6;
-            pointer-events: none;
-        }
-
-        .predict-btn {
-            width: 100%;
-            padding: 16px 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.3px;
-        }
-
-        .predict-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .predict-btn:active {
-            transform: translateY(0);
-        }
-
-        .predict-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .loading {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-        }
-
-        .spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid transparent;
-            border-top: 2px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .result {
-            margin-top: 25px;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            display: none;
-            letter-spacing: 0.2px;
-        }
-
-        .result.anemia {
-            background: linear-gradient(135deg, #ff7675, #fd79a8);
-            color: white;
-            box-shadow: 0 8px 25px rgba(255, 118, 117, 0.3);
-        }
-
-        .result.no-anemia {
-            background: linear-gradient(135deg, #00b894, #00cec9);
-            color: white;
-            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.3);
-        }
-
-        .result-icon {
-            font-size: 32px;
-            margin-bottom: 10px;
-            display: block;
-        }
-
-        .error {
-            background: #ff7675;
-            color: white;
-            padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-            margin-top: 20px;
-            display: none;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-        }
-
-        .info-text {
-            color: #7f8c8d;
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            font-weight: 400;
-            text-align: center;
-            margin-top: 20px;
-            line-height: 1.5;
-            letter-spacing: 0.1px;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 25px;
-                margin: 10px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HemoCare — Frontend (Custom API URL)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@500&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:"Inter",system-ui,Arial;
+      background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+    }
+    .card{
+      width:100%;max-width:720px;background:rgba(255,255,255,.98);border-radius:14px;padding:26px;
+      box-shadow:0 18px 40px rgba(0,0,0,.12);
+    }
+    h1{font-family:"Poppins",sans-serif;margin-bottom:6px;font-size:24px}
+    p.lead{color:#667; margin-bottom:18px}
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+    label{display:block;font-weight:600;color:#2c3e50;margin-bottom:6px;font-size:14px}
+    input[type="text"], input[type="number"], select {
+      width:100%;padding:12px 14px;border-radius:10px;border:1px solid #e6e9ef;background:#fbfcfe;font-size:15px;
+    }
+    input[type="text"]:focus,input[type="number"]:focus,select:focus{outline:none;box-shadow:0 6px 18px rgba(102,126,234,.08)}
+    .controls{display:flex;gap:12px;margin-top:16px;align-items:center}
+    button{
+      background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:12px 18px;border:none;border-radius:10px;
+      cursor:pointer;font-weight:700; font-size:15px;
+    }
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .result{
+      margin-top:18px;padding:16px;border-radius:10px;display:none;font-weight:700;
+    }
+    .result.ok{background:linear-gradient(135deg,#00b894,#00cec9);color:white}
+    .result.warn{background:linear-gradient(135deg,#ff7675,#fd79a8);color:white}
+    .error{margin-top:12px;padding:12px;border-radius:10px;background:#ff7675;color:white;display:none}
+    .small{font-size:13px;color:#556; margin-top:8px}
+    .api-row{display:flex;gap:10px;align-items:center}
+    .api-row input{flex:1}
+    .notes{margin-top:14px;font-size:13px;color:#6b7280}
+    .flex-between{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+  </style>
 </head>
 <body>
-    <div class="container fade-in">
-        <div class="header">
-            <div class="logo"></div>
-            <h1>HemoCare</h1>
-            <p class="subtitle">AI-Powered Anemia Detection</p>
-        </div>
+  <div class="card" role="main">
+    <h1>HemoCare — Quick Predict</h1>
+    <p class="lead">Enter measurements and your backend API URL (you can use a Render/Heroku/Colab endpoint). The form will POST JSON to that URL.</p>
 
-        <form id="predictionForm">
-            <div class="form-group">
-                <label for="red">Red Light Absorption (a.u.)</label>
-                <input type="number" id="red" name="red" step="0.01" required placeholder="Enter red light value">
-            </div>
-
-            <div class="form-group">
-                <label for="infrared">Infrared Light Absorption (a.u.)</label>
-                <input type="number" id="infrared" name="infrared" step="0.01" required placeholder="Enter IR value">
-            </div>
-
-            <div class="form-group">
-                <label for="gender">Gender</label>
-                <select id="gender" name="gender" required>
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="age">Age (years)</label>
-                <input type="number" id="age" name="age" min="1" max="120" required placeholder="Enter age">
-            </div>
-
-            <button type="submit" class="predict-btn" id="predictBtn">
-                <span class="btn-text">Predict Anemia Risk</span>
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <span>Analyzing...</span>
-                </div>
-            </button>
-        </form>
-
-        <div class="result" id="result">
-            <span class="result-icon" id="resultIcon"></span>
-            <div id="resultText"></div>
-        </div>
-
-        <div class="error" id="error"></div>
-
-        <p class="info-text">
-            Enter your spectroscopic measurements and demographic information for AI-based anemia risk assessment. 
-            This tool is for educational purposes and should not replace professional medical diagnosis.
-        </p>
+    <div class="api-row">
+      <label for="apiUrl" style="margin-right:12px;min-width:90px;">API URL</label>
+      <input id="apiUrl" type="text" placeholder="https://hemocare-9t4e.onrender.com/api/predict/" value="" />
+      <button id="testApiBtn" type="button">Test</button>
     </div>
+    <div class="small">Tip: include the full path (e.g. <code>/api/predict/</code>) and start with <code>https://</code>.</div>
 
-    <script>
-        const form = document.getElementById('predictionForm');
-        const predictBtn = document.getElementById('predictBtn');
-        const btnText = document.querySelector('.btn-text');
-        const loading = document.getElementById('loading');
-        const result = document.getElementById('result');
-        const resultIcon = document.getElementById('resultIcon');
-        const resultText = document.getElementById('resultText');
-        const error = document.getElementById('error');
+    <hr style="margin:18px 0;border:none;border-top:1px solid #eef2f7">
 
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // Hide previous results
-            result.style.display = 'none';
-            error.style.display = 'none';
-            result.classList.remove('anemia', 'no-anemia');
-            
-            // Show loading state
-            predictBtn.disabled = true;
-            btnText.style.display = 'none';
-            loading.style.display = 'flex';
-            
-            // Get form data
-            const formData = new FormData(form);
-            const data = {
-                red: parseFloat(formData.get('red')),
-                infrared: parseFloat(formData.get('infrared')),
-                gender: formData.get('gender'),
-                age: parseInt(formData.get('age'))
-            };
-            
-            try {
-                // Make API call
-                const response = await fetch('https://hemocare-9t4e.onrender.com', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Server error: ${response.status}`);
-                }
-                
-                const prediction = await response.json();
-                
-                // Display result
-                showResult(prediction);
-                
-            } catch (err) {
-                console.error('Prediction error:', err);
-                showError('Unable to connect to the prediction service. Please check your internet connection and try again.');
-            } finally {
-                // Reset button state
-                predictBtn.disabled = false;
-                btnText.style.display = 'inline';
-                loading.style.display = 'none';
-            }
+    <form id="predictForm">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label for="red">Red light absorption (a.u.)</label>
+          <input id="red" name="red" type="number" step="0.01" required />
+        </div>
+        <div>
+          <label for="ir">Infrared absorption (a.u.)</label>
+          <input id="ir" name="ir" type="number" step="0.01" required />
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+        <div>
+          <label for="gender">Gender</label>
+          <select id="gender" name="gender" required>
+            <option value="">Select</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+        <div>
+          <label for="age">Age (years)</label>
+          <input id="age" name="age" type="number" min="0" max="130" required />
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="submitBtn" type="submit">Predict</button>
+        <div style="margin-left:auto" id="statusText" class="small"></div>
+      </div>
+    </form>
+
+    <div id="resultBox" class="result"></div>
+    <div id="errorBox" class="error"></div>
+
+    <div class="flex-between notes">
+      <div>Response expects JSON with <code>predicted_hb</code> (numeric) or similar keys.</div>
+      <div style="font-size:12px;color:#9aa">WHO-ish cutoffs used: female &lt; 12 g/dL, male &lt; 13 g/dL</div>
+    </div>
+  </div>
+
+  <script>
+    const apiInput = document.getElementById('apiUrl');
+    const testBtn = document.getElementById('testApiBtn');
+    const form = document.getElementById('predictForm');
+    const resultBox = document.getElementById('resultBox');
+    const errorBox = document.getElementById('errorBox');
+    const submitBtn = document.getElementById('submitBtn');
+    const statusText = document.getElementById('statusText');
+
+    // Optional: remember last used API in localStorage
+    apiInput.value = localStorage.getItem('hc_api') || '';
+
+    testBtn.addEventListener('click', async () => {
+      const url = apiInput.value.trim();
+      clearMessages();
+      if (!url) { showError('Enter API URL first'); return; }
+      try {
+        statusText.textContent = 'Testing...';
+        // run a lightweight OPTIONS or GET to check availability (some APIs don't allow GET)
+        const resp = await fetch(url, { method: 'OPTIONS' });
+        statusText.textContent = `Status: ${resp.status} ${resp.statusText}`;
+        localStorage.setItem('hc_api', url);
+      } catch (err) {
+        statusText.textContent = '';
+        showError('API test failed — cross-origin or server error. Try full URL ending with /predict/ or use the server domain and check CORS.');
+        console.error(err);
+      }
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearMessages();
+      const url = apiInput.value.trim();
+      if (!url) { showError('Please provide the backend API URL.'); return; }
+
+      const payload = {
+        red: parseFloat(document.getElementById('red').value),
+        ir: parseFloat(document.getElementById('ir').value),
+        gender: document.getElementById('gender').value,
+        age: parseFloat(document.getElementById('age').value)
+      };
+
+      // basic validation
+      if (isNaN(payload.red) || isNaN(payload.ir) || !payload.gender || isNaN(payload.age)) {
+        showError('Please fill all fields with valid values.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      statusText.textContent = 'Sending...';
+
+      try {
+        // Save used URL
+        localStorage.setItem('hc_api', url);
+
+        const resp = await fetch(url, {
+          method: 'POST',
+          mode: 'cors', // depends on backend CORS settings
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(payload)
         });
 
-        function showResult(prediction) {
-            // Determine if anemia is predicted based on the response
-            // Adjust this logic based on your API's response format
-            const hasAnemia = prediction.prediction === 1 || 
-                             prediction.result === 'anemia' || 
-                             prediction.anemia === true ||
-                             (prediction.prediction && prediction.prediction.toLowerCase().includes('anemia'));
-            
-            if (hasAnemia) {
-                result.classList.add('anemia');
-                resultIcon.textContent = '⚠️';
-                resultText.innerHTML = '<strong>Anemia Risk Detected</strong><br>Please consult a healthcare professional for proper diagnosis and treatment.';
-            } else {
-                result.classList.add('no-anemia');
-                resultIcon.textContent = '✅';
-                resultText.innerHTML = '<strong>Low Anemia Risk</strong><br>Your results suggest normal hemoglobin levels. Continue maintaining a healthy lifestyle.';
-            }
-            
-            result.style.display = 'block';
-            result.classList.add('fade-in');
+        if (!resp.ok) {
+          // read text if available for debugging
+          let text = await resp.text().catch(()=>null);
+          throw new Error(`Server returned ${resp.status}${text ? ': '+text : ''}`);
         }
 
-        function showError(message) {
-            error.textContent = message;
-            error.style.display = 'block';
-            error.classList.add('fade-in');
+        const data = await resp.json().catch(()=>null);
+        if (!data) throw new Error('Server returned non-JSON response');
+
+        // figure out numeric Hb from common keys
+        const hb = firstNumeric(data, ['predicted_hb','predicted','hb','hemoglobin','prediction','result_hb']);
+        if (hb === null) {
+          // sometimes server wraps result: { predicted_hb: { value: 12.3 } }
+          // flatten values and try
+          const flattened = JSON.stringify(data);
+          throw new Error('No numeric predicted_hb found in JSON. Response: ' + flattened);
         }
 
-        // Input validation and formatting
-        document.getElementById('red').addEventListener('input', function(e) {
-            if (e.target.value < 0) e.target.value = 0;
-        });
+        // Determine anemia risk by gender (simple rule-of-thumb)
+        const gender = (payload.gender||'').toLowerCase();
+        const femaleCut = 12.0, maleCut = 13.0;
+        const isAnemia = (gender === 'female' && hb < femaleCut) || (gender === 'male' && hb < maleCut);
 
-        document.getElementById('infrared').addEventListener('input', function(e) {
-            if (e.target.value < 0) e.target.value = 0;
-        });
+        resultBox.style.display = 'block';
+        resultBox.className = 'result ' + (isAnemia ? 'warn' : 'ok');
+        resultBox.innerHTML = `<div>Predicted Hb: <strong>${hb.toFixed(2)} g/dL</strong></div>
+                               <div style="font-weight:600;margin-top:6px">${isAnemia ? 'Anemia risk detected — consult a healthcare professional.' : 'Low anemia risk'}</div>`;
 
-        document.getElementById('age').addEventListener('input', function(e) {
-            if (e.target.value < 1) e.target.value = 1;
-            if (e.target.value > 120) e.target.value = 120;
-        });
-    </script>
+      } catch (err) {
+        console.error(err);
+        showError(err.message || 'Unknown error when calling backend');
+      } finally {
+        submitBtn.disabled = false;
+        statusText.textContent = '';
+      }
+    });
+
+    function firstNumeric(obj, keys){
+      for(const k of keys){
+        if (k in obj){
+          const val = obj[k];
+          const n = Number(val);
+          if (!Number.isNaN(n)) return n;
+          // if nested like {predicted_hb: {value:12.3}}
+          if (val && typeof val === 'object') {
+            // try find numeric inside
+            for(const kk in val){
+              const n2 = Number(val[kk]);
+              if (!Number.isNaN(n2)) return n2;
+            }
+          }
+        }
+      }
+      // fallback: search all top-level values for numeric
+      for(const k in obj){
+        const n = Number(obj[k]);
+        if (!Number.isNaN(n)) return n;
+      }
+      return null;
+    }
+
+    function showError(msg){
+      errorBox.style.display = 'block';
+      errorBox.textContent = msg;
+    }
+    function clearMessages(){
+      resultBox.style.display = 'none';
+      resultBox.textContent = '';
+      errorBox.style.display = 'none';
+      errorBox.textContent = '';
+      statusText.textContent = '';
+    }
+  </script>
 </body>
 </html>
